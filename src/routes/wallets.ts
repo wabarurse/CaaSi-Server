@@ -50,7 +50,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Get wallet by user id
+// Get all wallets by user id
 router.get("/", async (req, res) => {
   try {
     const { userId } = req.body;
@@ -59,17 +59,13 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ error: "Missing required field: userId" });
     }
 
-    const [wallet] = await db.select().from(wallets).where(eq(wallets.userId, userId));
+    const userWallets = await db.select().from(wallets).where(eq(wallets.userId, userId));
 
-    if (!wallet) {
-      return res.status(404).json({ error: "Wallet not found" });
-    }
-
-    logger.info("Wallet fetched", { userId });
-    return res.json({ walletId: wallet.id, address: wallet.address });
+    logger.info("Wallets fetched", { userId, count: userWallets.length });
+    return res.json(userWallets.map((wallet) => ({ walletId: wallet.id, address: wallet.address })));
   } catch (error) {
-    logger.error("Error fetching wallet", error);
-    return res.status(500).json({ error: "Failed to fetch wallet" });
+    logger.error("Error fetching wallets", error);
+    return res.status(500).json({ error: "Failed to fetch wallets" });
   }
 });
 
