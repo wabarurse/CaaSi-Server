@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
 // Get user by id
 router.get("/", async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.query.userId as string;
 
     if (!userId) {
       return res.status(400).json({ error: "Missing required field: userId" });
